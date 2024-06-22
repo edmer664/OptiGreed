@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { GlobalContext } from '../../App'
 import FormItem from './FormItem';
 import { Job } from '../../types/Types';
+import { GlobalContext } from '../../context/GlobalContext';
 
 interface IJobFormData {
     id: string,
@@ -9,22 +9,28 @@ interface IJobFormData {
 }
 
 export default function AddJobForm() {
-    const { jobs, setJobs } = useContext(GlobalContext);
+    const globalContext = useContext(GlobalContext);
+
+    if (!globalContext) {
+        throw new Error('ThemeSwitcher must be used within a Provider');
+    }
+
+    const { setJobs } = globalContext;
     const [formData, setFormData] = useState<IJobFormData>({
         id: (Math.round(Math.random() * 10000)).toString(),
-        difficulty: 1,
+        difficulty: Math.round(Math.random() * 100),
     });
-    const [formErrors, setFormErrors] = useState<any>({
+    const [formErrors, setFormErrors] = useState<{ name: string, capacity: string }>({
         name: "",
         capacity: ""
     })
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, isNumber: boolean = false) => {
         const { name, value } = event.target;
 
         setFormData((prevData: IJobFormData): IJobFormData => ({
             ...prevData,
-            [name]: value
+            [name]: isNumber ? parseInt(value) : value,
         }));
     }
 
@@ -36,7 +42,7 @@ export default function AddJobForm() {
             return;
         }
 
-        handleInputChange(event);
+        handleInputChange(event, true);
     }
 
     const resetErrors = () => {
@@ -79,6 +85,15 @@ export default function AddJobForm() {
             returnable.push(newData);
             return returnable;
         })
+
+        resetForm();
+    }
+
+    const resetForm = () => {
+        setFormData({
+            id: (Math.round(Math.random() * 10000)).toString(),
+            difficulty: Math.round(Math.random() * 100),
+        })
     }
 
     useEffect(() => {
@@ -118,7 +133,7 @@ export default function AddJobForm() {
                 >
                     <button
                         className='py-3 rounded shadow bg-blue-500 text-white uppercase text-center hover:bg-blue-800 transition-all duration-200'
-                        onClick={(e: any) => handleCreate(formData)}
+                        onClick={() => handleCreate(formData)}
                     >
                         Create
                     </button>

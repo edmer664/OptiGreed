@@ -1,14 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react'
 import FormItem from './FormItem';
-import { GlobalContext } from '../../App';
 import { Server } from '../../types/Types';
+import { GlobalContext } from '../../context/GlobalContext';
 
 
 interface IServerFormData {
     name: string, capacity: number
 }
 export default function AddServerForm() {
-    const { servers, setServers } = useContext(GlobalContext);
+    const globalContext = useContext(GlobalContext);
+
+    if (!globalContext) {
+        throw new Error('ThemeSwitcher must be used within a Provider');
+      }
+
+    const { setServers } = globalContext;
     const [formData, setFormData] = useState<IServerFormData>({
         name: "",
         capacity: 1,
@@ -79,6 +85,15 @@ export default function AddServerForm() {
             returnable.push(newData);
             return returnable;
         })
+
+        resetForm()
+    }
+
+    function resetForm() {
+        setFormData({
+            name: "",
+            capacity: 1
+        })
     }
 
     useEffect(() => {
@@ -118,7 +133,7 @@ export default function AddServerForm() {
                 >
                     <button
                         className='py-3 rounded shadow bg-blue-500 text-white uppercase text-center hover:bg-blue-800 transition-all duration-200'
-                        onClick={(e: any) => handleCreate(formData)}
+                        onClick={() => handleCreate(formData)}
                     >
                         Create
                     </button>

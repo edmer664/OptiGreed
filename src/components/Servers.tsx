@@ -1,27 +1,36 @@
 import React, { useContext } from 'react'
 import { Server } from '../types/Types'
-import { GlobalContext } from '../App'
 import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, registerables } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { GlobalContext } from '../context/GlobalContext';
 
 
 export default function Servers() {
     ChartJS.register(ArcElement, Tooltip, Legend);
 
-    const { servers } = useContext(GlobalContext);
+    const globalContext = useContext(GlobalContext);
+
+    if (!globalContext) {
+        throw new Error('ThemeSwitcher must be used within a Provider');
+      }
+
+    const { servers} = globalContext;
 
 
     return (
         <>
             <div
-                className='grid grid-cols-3 gap-2 max-h-[80vh] overflow-scroll py-5'
-            >
-                {servers.map((server) => (<>
-                    <ServerItem server={server} />
+                className='max-h-[75vh] h-[75vh] overflow-scroll pb-20 p-5 border rounded-lg shadow-lg bg-gray-50'>
+                <div
+                    className='grid grid-cols-3 gap-5 '
+                >
+                    {servers.map((server) => (<>
+                        <ServerItem server={server} />
 
-                </>))}
+                    </>))}
 
 
+                </div>
             </div>
 
         </>
@@ -37,23 +46,24 @@ function ServerItem({ server }: { server: Server }) {
                 {server.name}
             </h2>
             <div
-                className='w-full h-full'
+                className='w-full'
             >
                 <Doughnut
                     data={{
                         datasets: [{
                             data: [server.load / server.capacity * 100, 100 - (server.load / server.capacity * 100)
                             ],
-                            backgroundColor:[
+                            backgroundColor: [
                                 '#ff555a',
                                 '#66dd66'
                             ]
                         }],
-                        labels:[
+                        labels: [
                             'In Use',
                             'Available'
                         ]
                     }}
+                    options={{ responsive: true, maintainAspectRatio: true }}
                 />
             </div>
 

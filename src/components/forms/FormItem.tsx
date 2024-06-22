@@ -5,13 +5,13 @@ interface IFormItem {
     name: string,
     type: string,
     value: any,
-    error:{
+    error: {
         formErrors: any,
         setFormErrors: React.Dispatch<React.SetStateAction<any>>
     }
 }
 export default function FormItem(props: IFormItem) {
-    const hasError = props.error.formErrors[props.name] ;
+    const hasError = props.error.formErrors[props.name];
 
     return (
         <>
@@ -19,12 +19,11 @@ export default function FormItem(props: IFormItem) {
                 className='flex flex-col my-2'
             >
                 <label
-
                 >
                     {props.name.toUpperCase()}
                 </label>
                 <input
-                    className='border py-3 px-4 focus:shadow rounded' 
+                    className='border py-3 px-4 focus:shadow rounded'
                     name={props.name}
                     type={props.type}
                     value={props.value}
@@ -33,8 +32,8 @@ export default function FormItem(props: IFormItem) {
                 {hasError && <>
                     <small
                         className='text-red-500'>
-                            {props.error.formErrors[props.name]}
-                        </small>
+                        {props.error.formErrors[props.name]}
+                    </small>
                 </>}
             </div>
         </>
