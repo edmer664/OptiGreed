@@ -18,12 +18,12 @@ export default function AddServerForm() {
         capacity: ""
     })
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, isNumber: boolean = false) => {
         const { name, value } = event.target;
 
         setFormData((prevData: IServerFormData): IServerFormData => ({
             ...prevData,
-            [name]: value
+            [name]: isNumber ? parseInt(value) : value,
         }));
     }
 
@@ -35,7 +35,7 @@ export default function AddServerForm() {
             return;
         }
 
-        handleInputChange(event);
+        handleInputChange(event, true);
     }
 
     const resetErrors = () => {
@@ -56,7 +56,7 @@ export default function AddServerForm() {
             }))
         }
 
-        if (!data.capacity || (typeof(data.capacity) !== 'number')){
+        if (!data.capacity || (typeof (data.capacity) !== 'number')) {
             hasError = true;
             setFormErrors((prev: any) => ({
                 ...prev,
