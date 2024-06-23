@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import  { useContext } from 'react'
 import { Job } from '../types/Types';
 import { GlobalContext } from '../context/GlobalContext';
 

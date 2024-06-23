@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useState } from 'react'
+import  { ReactNode, createContext, useState } from 'react'
 import { IGlobalContext, Job, Server } from '../types/Types';
 
 export const GlobalContext = createContext<IGlobalContext | undefined>(undefined);

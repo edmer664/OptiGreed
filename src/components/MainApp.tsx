@@ -12,49 +12,61 @@ export default function MainApp() {
 
     if (!globalContext) {
         throw new Error('ThemeSwitcher must be used within a Provider');
-      }
+    }
 
     const { servers, setServers, jobs, setJobs } = globalContext;
 
     useEffect(() => {
         const processJobs = setInterval(() => {
+            const [newServers, newJobs] = processQueue(servers, jobs);
+            setServers(newServers);
+            setJobs(newJobs);
             processTasks(setServers);
-            processQueue(servers, setServers, jobs, setJobs);
+
         }, 2000);
 
         return () => clearInterval(processJobs);
 
-    }, [servers,jobs])
+    }, [servers, jobs])
 
     function processQueue(
         servers: Server[],
-        setServers: React.Dispatch<React.SetStateAction<Array<Server>>>,
         jobs: Job[],
-        setJobs: React.Dispatch<React.SetStateAction<Array<Job>>>
-    ) {
+    ): [Server[], Job[]] {
         console.log("Running1")
-        console.table({servers,jobs});
-        const newArray: Job[] = [...jobs];
+        console.table({ servers, jobs });
+        let returnableServers = null;
+        let returnableJobs = null;
+
+
+        let newArray: Job[] = [...jobs];
         const nextJob: Job | undefined = newArray.shift();
 
         if (!nextJob) {
-            return;
+            return [servers, jobs];
         }
 
         try {
             console.log("Running12")
-            console.table({servers,jobs});
+            console.table({ servers, jobs });
             const newServer = loadBalancer(servers, nextJob);
-            if(newServer){
-                setServers(newServer)
-            }else{
-                setServers(servers)
+            if (newServer) {
+
+                returnableServers = newServer;
+            } else {
+
+                returnableServers = servers;
             }
         } catch (error) {
-            return;
+            const [recursiveServers,recursiveJobs]= processQueue(servers, newArray)
+            newArray = [nextJob, ...recursiveJobs];
+            returnableServers = recursiveServers;
+            
         }
-        setJobs(newArray);
-    
+
+        returnableJobs = newArray;
+
+        return [returnableServers, returnableJobs];
 
     }
 
